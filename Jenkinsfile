@@ -68,7 +68,7 @@ pipeline {
                         -e AWS_DEFAULT_REGION='us-east-1' \
                         docker.io/amazon/aws-cli'
 
-                        . aws-env-populater.sh
+                        source aws-env-populater.sh
 
 
                     '''
