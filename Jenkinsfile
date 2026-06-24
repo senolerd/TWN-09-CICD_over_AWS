@@ -65,7 +65,7 @@ pipeline {
                     sh '''
                         alias aws='podman run -i --rm  -e AWS_ACCESS_KEY_ID=$AWS_KID \
                         -e AWS_SECRET_ACCESS_KEY=$AWS_KEY \
-                        -e AWS_DEFAULT_REGION='us-east-1' \
+                        -e AWS_DEFAULT_REGION="us-east-1" \
                         docker.io/amazon/aws-cli'
 
                         source aws-env-populater.sh
