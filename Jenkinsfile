@@ -63,10 +63,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'aws_devops-user-1_access_k_id_and_key', passwordVariable: 'AWS_KEY', usernameVariable: 'AWS_KID')]) {
 
                     sh '''
-                        alias aws='podman run -i --rm  -e AWS_ACCESS_KEY_ID=$AWS_KID \
-                        -e AWS_SECRET_ACCESS_KEY=$AWS_KEY \
-                        -e AWS_DEFAULT_REGION="us-east-1" \
-                        docker.io/amazon/aws-cli'
+                        alias aws='podman run -i --rm  -e AWS_ACCESS_KEY_ID=$AWS_KID -e AWS_SECRET_ACCESS_KEY=$AWS_KEY -e AWS_DEFAULT_REGION="us-east-1" docker.io/amazon/aws-cli'
 
                         source aws-env-populater.sh
 
