@@ -23,18 +23,18 @@ pipeline {
             }
         }
 
-        stage('Maven Packing') {
-            steps {
-                mavenCleanPackage()
-            }
+        // stage('Maven Packing') {
+        //     steps {
+        //         mavenCleanPackage()
+        //     }
 
-            post { failure { emailext(
-                        subject: "⚠️ FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
-                        body: """Stage 'Maven Compile' failed.
-                                Check the logs here: ${env.BUILD_URL}console""",
-                        to: 'devops-team@company.com, dev-team@company.com')}
-            }
-        }
+        //     post { failure { emailext(
+        //                 subject: "⚠️ FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
+        //                 body: """Stage 'Maven Compile' failed.
+        //                         Check the logs here: ${env.BUILD_URL}console""",
+        //                 to: 'devops-team@company.com, dev-team@company.com')}
+        //     }
+        // }
 
         // stage('OCI Image Build') {
         //     // If code is SNAPSHOT, don't build image
@@ -68,8 +68,8 @@ pipeline {
                         -e AWS_DEFAULT_REGION='us-east-1' \
                         docker.io/amazon/aws-cli'
 
-                        aws s3 ls
-                        echo $APP_VER
+                        . aws-env-populater.sh
+
 
                     '''
                 }
