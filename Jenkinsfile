@@ -36,7 +36,6 @@ pipeline {
             }
         }
 
-
         // stage('Maven Packing') {
         //     steps {
         //         mavenCleanPackage()
