@@ -24,7 +24,7 @@ pipeline {
         stage('AWS deployment populate') {
             steps {
                 script{
-                    def repo_name = ${AWS_PROJECT_NAME.toLowerCase()}
+                    def repo_name = "${AWS_PROJECT_NAME.toLowerCase()}"
                     // Create Repository
                     if ( !awsCli("ecr describe-repositories --repository-name ${repo_name}")) {
                         awsCli("ecr create-repository --repository-name ${repo_name}")
