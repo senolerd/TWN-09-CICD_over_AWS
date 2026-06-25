@@ -4,8 +4,6 @@ pipeline {
     agent any
     environment {
         SRC_REGISTER = 'docker.io'
-        DEST_REGISTER = 'docker.io'
-        DEST_REPO = "$DEST_REGISTER/senolerd"
         MAVEN_IMG = "$SRC_REGISTER/maven:3-eclipse-temurin-17"
         BUILD_IMG = "$SRC_REGISTER/eclipse-temurin:17-jre-jammy"
         DOCKER_CREDENTIAL_ID = 'senolerd_docker'
@@ -13,7 +11,7 @@ pipeline {
 
         // It is gping to be used for the application related AWS resource naming and tagging as prefix
         AWS_REGION="us-east-1"
-        AWS_APP_PREFIX = 'MavenApp-Dev-'
+        AWS_PROJECT_NAME = 'mavenJavaApp'
     }
 
     stages {
@@ -22,6 +20,16 @@ pipeline {
                 __init__()
             }
         }
+
+        stage('AWS deployment populate') {
+            steps {
+                script{
+                    // Create Repository
+                    awsCli("ecr create-repository --repository-name ${AWS_PROJECT_NAME}")
+                }
+            }
+        }
+
 
         // stage('Maven Packing') {
         //     steps {
@@ -56,13 +64,6 @@ pipeline {
         //     }
         // }
 
-        stage('AWS deployment populate') {
-            steps {
-                script{
-                    def s3Ls = awsCli("s3 ls")
-                    echo "${s3Ls}"
-                }
-            }
-        }
+
     }
 }
