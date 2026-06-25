@@ -30,13 +30,22 @@ pipeline {
                 // awsVpcCheck(AWS_PROJECT_NAME)
 
                 script{
-                    sh """
-                    chmod +x aws-env-populater.sh
-                    ./aws-env-populater.sh
-                    """
+
+                    withEnv([]){
+
+                        sh '''
+                            chmod +x aws-env-populater.sh
+                            ./aws-env-populater.sh AWS_ACCESS_KEY_ID=$AWS_KID AWS_SECRET_ACCESS_KEY=$AWS_KEY AWS_DEFAULT_REGION=$AWS_REGION
+                        '''
+                    }
+                    
+
+
+                // AWS_ACCESS_KEY_ID=$AWS_KID \
+                // AWS_SECRET_ACCESS_KEY=$AWS_KEY \
+                // AWS_DEFAULT_REGION=$AWS_REGION \
+
                 }
-
-
             }
         }
 
