@@ -30,7 +30,10 @@ pipeline {
                 // awsVpcCheck(AWS_PROJECT_NAME)
 
                 script{
-                    sh 'source . aws-env-populater.sh'
+                    sh """
+                    chmod +x aws-env-populater.sh
+                    ./aws-env-populater.sh
+                    """
                 }
 
 
