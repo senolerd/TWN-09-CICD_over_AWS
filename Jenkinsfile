@@ -25,7 +25,7 @@ pipeline {
             steps {
                 script{
                     // Create Repository
-                    awsCli("ecr create-repository --repository-name ${AWS_PROJECT_NAME}")
+                    awsCli("ecr create-repository --repository-name ${AWS_PROJECT_NAME.toLowerCase()}")
                 }
             }
         }
