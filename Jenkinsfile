@@ -58,10 +58,10 @@ pipeline {
 
         stage('AWS deployment populate') {
             steps {
-                script(
+                script{
                     def s3Ls = awsCli("s3 ls")
                     echo "${s3Ls}"
-                )
+                }
             }
         }
     }
