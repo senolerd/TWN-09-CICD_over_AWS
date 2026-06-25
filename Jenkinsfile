@@ -21,9 +21,17 @@ pipeline {
             }
         }
 
-        stage('AWS ECR repo check') {
+        stage('AWS resource check') {
             steps {
+                echo "AWS ECR repo check for ${AWS_PROJECT_NAME.toLowerCase()}"
                 awsEcrRepoCheck(AWS_PROJECT_NAME.toLowerCase())
+
+                echo "AWS VPC check for "
+                awsVpcCheck(AWS_PROJECT_NAME)
+
+
+
+
             }
         }
 
