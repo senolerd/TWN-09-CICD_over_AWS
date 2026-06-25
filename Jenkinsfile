@@ -23,7 +23,7 @@ pipeline {
 
         stage('AWS ECR repo check') {
             steps {
-                awsEcrRepoCheck( AWS_PROJECT_NAME.toLowerCase() )
+                awsEcrRepoCheck(AWS_PROJECT_NAME.toLowerCase())
             }
         }
 
