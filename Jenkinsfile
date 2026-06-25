@@ -23,13 +23,15 @@ pipeline {
 
         stage('AWS resource check') {
             steps {
-                echo "AWS ECR repo check for ${AWS_PROJECT_NAME.toLowerCase()}"
-                awsEcrRepoCheck(AWS_PROJECT_NAME.toLowerCase())
+                // echo "AWS ECR repo check for ${AWS_PROJECT_NAME.toLowerCase()}"
+                // awsEcrRepoCheck(AWS_PROJECT_NAME.toLowerCase())
 
-                echo "AWS VPC check for "
-                awsVpcCheck(AWS_PROJECT_NAME)
+                // echo "AWS VPC check for ${AWS_PROJECT_NAME}"
+                // awsVpcCheck(AWS_PROJECT_NAME)
 
-
+                script{
+                    sh 'source . aws-env-populater.sh'
+                }
 
 
             }
