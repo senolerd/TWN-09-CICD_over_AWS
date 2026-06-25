@@ -33,18 +33,13 @@ pipeline {
 
                     withEnv([]){
 
-                        sh '''
-                            chmod +x aws-env-populater.sh
-                            ./aws-env-populater.sh AWS_ACCESS_KEY_ID=$AWS_KID AWS_SECRET_ACCESS_KEY=$AWS_KEY AWS_DEFAULT_REGION=$AWS_REGION
-                        '''
+                        withCredentials([usernamePassword(credentialsId: 'aws_devops-user-1_access_k_id_and_key', passwordVariable: 'AWS_KEY', usernameVariable: 'AWS_KID')]) {
+                            sh '''
+                                chmod +x aws-env-populater.sh
+                                ./aws-env-populater.sh AWS_ACCESS_KEY_ID=$AWS_KID AWS_SECRET_ACCESS_KEY=$AWS_KEY AWS_DEFAULT_REGION=$AWS_REGION
+                            '''
+                        }
                     }
-                    
-
-
-                // AWS_ACCESS_KEY_ID=$AWS_KID \
-                // AWS_SECRET_ACCESS_KEY=$AWS_KEY \
-                // AWS_DEFAULT_REGION=$AWS_REGION \
-
                 }
             }
         }
