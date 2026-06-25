@@ -26,7 +26,7 @@ pipeline {
                 script{
                     def repo_name = "${AWS_PROJECT_NAME.toLowerCase()}"
                     // Create Repository
-                    if ( !awsCli("ecr describe-repositories --repository-name ${repo_name}")) {
+                    if ( awsCli("ecr describe-repositories --repository-name ${repo_name}") != 0) {
                         awsCli("ecr create-repository --repository-name ${repo_name}")
                         echo "Repo ${repo_name} is created."
                     } else {
