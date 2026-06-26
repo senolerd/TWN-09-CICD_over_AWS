@@ -3,17 +3,16 @@
 pipeline {
     agent any
     environment {
+        APP_NAME = 'mavenJava'
+        //APP_VER = "" // will be assigned dynamic in __init__()
         SRC_CONTAINER_REGISTRY = 'docker.io'
         // DEST_CONTAINER_REGISTRY = 'docker.io'
-        // DEST_CONTAINER_REPO = "$DEST_CONTAINER_REGISTRY/senolerd"
+        // DEST_CONTAINER_REPO = "$DEST_CONTAINER_REGISTRY/$APP_NAME"
+
         MAVEN_IMG = "$SRC_CONTAINER_REGISTRY/maven:3-eclipse-temurin-17"
         BUILD_IMG = "$SRC_CONTAINER_REGISTRY/eclipse-temurin:17-jre-jammy"
-        // DOCKER_CREDENTIAL_ID = 'senolerd_docker'
-        //APP_VER = "" // will be assigned dynamic in __init__()
-
         AWS_REGION="us-east-1"
-        AWS_PROJECT_NAME = 'mavenJava'
-        // ECR registry and repo will be set to REMOTE_REGISTRY/REMOTE_REPO in JSL 
+        // ECR registry and repo will be set to REMOTE_REGISTRY/REMOTE_REPO in JSL awsEcrRepoCheck()
     }
 
     stages {
@@ -27,8 +26,8 @@ pipeline {
             steps {
                 // Checking ECR repo, if there isn't for the project it will be created.
                 // The ECR repo address will be accessable via emv.ECR_REPO at further stage and steps.
-                echo "AWS ECR repo check for ${AWS_PROJECT_NAME.toLowerCase()}"
-                awsEcrRepoCheck(AWS_PROJECT_NAME.toLowerCase())
+                echo "AWS ECR repo check for ${APP_NAME.toLowerCase()}"
+                awsEcrRepoCheck(APP_NAME.toLowerCase())
             }
         }
 
