@@ -3,15 +3,17 @@
 pipeline {
     agent any
     environment {
-        SRC_REGISTER = 'docker.io'
-        MAVEN_IMG = "$SRC_REGISTER/maven:3-eclipse-temurin-17"
-        BUILD_IMG = "$SRC_REGISTER/eclipse-temurin:17-jre-jammy"
-        DOCKER_CREDENTIAL_ID = 'senolerd_docker'
+        SRC_CONTAINER_REGISTRY = 'docker.io'
+        // DEST_CONTAINER_REGISTRY = 'docker.io'
+        // DEST_CONTAINER_REPO = "$DEST_CONTAINER_REGISTRY/senolerd"
+        MAVEN_IMG = "$SRC_CONTAINER_REGISTRY/maven:3-eclipse-temurin-17"
+        BUILD_IMG = "$SRC_CONTAINER_REGISTRY/eclipse-temurin:17-jre-jammy"
+        // DOCKER_CREDENTIAL_ID = 'senolerd_docker'
         //APP_VER = "" // will be assigned dynamic in __init__()
 
         AWS_REGION="us-east-1"
-        AWS_PROJECT_NAME = 'mavenJavaApp'
-        // ECR_REPO = // will be created and set in pipeline
+        AWS_PROJECT_NAME = 'mavenJava'
+        // ECR registry and repo will be set to REMOTE_REGISTRY/REMOTE_REPO in JSL 
     }
 
     stages {
@@ -53,15 +55,15 @@ pipeline {
             }
         }
 
-        stage('Image Push') {
-            // If code is SNAPSHOT, don't try to push any image
-            when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
+        // stage('Image Push') {
+        //     // If code is SNAPSHOT, don't try to push any image
+        //     when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
 
-            steps {
-                echo 'Pushing image...'
-                imagePush()
-            }
-        }
+        //     steps {
+        //         echo 'Pushing image...'
+        //         imagePush()
+        //     }
+        // }
 
 
     }
