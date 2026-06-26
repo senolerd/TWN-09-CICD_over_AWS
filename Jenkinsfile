@@ -9,9 +9,9 @@ pipeline {
         DOCKER_CREDENTIAL_ID = 'senolerd_docker'
         //APP_VER = "" // will be assigned dynamic in __init__()
 
-        // It is gping to be used for the application related AWS resource naming and tagging as prefix
         AWS_REGION="us-east-1"
         AWS_PROJECT_NAME = 'mavenJavaApp'
+        // ECR_REPO = // will be created in pipeline
     }
 
     stages {
@@ -23,24 +23,20 @@ pipeline {
 
         stage('AWS resource check') {
             steps {
-                // echo "AWS ECR repo check for ${AWS_PROJECT_NAME.toLowerCase()}"
-                // awsEcrRepoCheck(AWS_PROJECT_NAME.toLowerCase())
-
+                echo "AWS ECR repo check for ${AWS_PROJECT_NAME.toLowerCase()}"
+                awsEcrRepoCheck(AWS_PROJECT_NAME.toLowerCase())
+                echo "IS ECR_REPO SET?: ${ECR_REPO}"
                 // echo "AWS VPC check for ${AWS_PROJECT_NAME}"
                 // awsVpcCheck(AWS_PROJECT_NAME)
 
-                script{
-
-                    withEnv([]){
-
-                        withCredentials([usernamePassword(credentialsId: 'aws_devops-user-1_access_k_id_and_key', passwordVariable: 'AWS_KEY', usernameVariable: 'AWS_KID')]) {
-                            sh '''
-                                chmod +x aws-env-populater.sh
-                                ./aws-env-populater.sh $AWS_KID $AWS_KEY $AWS_REGION
-                            '''
-                        }
-                    }
-                }
+                // script{
+                //     withCredentials([usernamePassword(credentialsId: 'aws_devops-user-1_access_k_id_and_key', passwordVariable: 'AWS_KEY', usernameVariable: 'AWS_KID')]) {
+                //         sh '''
+                //             chmod +x aws-env-populater.sh
+                //             ./aws-env-populater.sh $AWS_KID $AWS_KEY $AWS_REGION
+                //         '''
+                //     }
+                // }
             }
         }
 
