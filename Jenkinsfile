@@ -25,6 +25,7 @@ pipeline {
         stage('__init__') {
             steps {
                 echo "init started"
+                
                 // __init__()
             }
         }
