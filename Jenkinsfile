@@ -22,50 +22,50 @@ pipeline {
     }
 
     stages {
-        stage('__init__') {
-            steps {
-                __init__()
-            }
-        }
+        // stage('__init__') {
+        //     steps {
+        //         __init__()
+        //     }
+        // }
 
-        stage('AWS ECR repo check') {
-            steps {
-                echo "AWS ECR repo check for ${APP_NAME.toLowerCase()}"
-                awsEcrRepoCheck(APP_NAME.toLowerCase()) // Only for ECR
-            }
-        }
+        // stage('AWS ECR repo check') {
+        //     steps {
+        //         echo "AWS ECR repo check for ${APP_NAME.toLowerCase()}"
+        //         awsEcrRepoCheck(APP_NAME.toLowerCase()) // Only for ECR
+        //     }
+        // }
 
-        stage('Maven Packing') {
-            steps {
-                mavenCleanPackage()
-            }
+        // stage('Maven Packing') {
+        //     steps {
+        //         mavenCleanPackage()
+        //     }
 
-            post { failure { emailext(
-                        subject: "⚠️ FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
-                        body: """Stage 'Maven Compile' failed.
-                                Check the logs here: ${env.BUILD_URL}console""",
-                        to: 'devops-team@company.com, dev-team@company.com')}
-            }
-        }
+        //     // post { failure { emailext(
+        //     //             subject: "⚠️ FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
+        //     //             body: """Stage 'Maven Compile' failed.
+        //     //                     Check the logs here: ${env.BUILD_URL}console""",
+        //     //             to: 'devops-team@company.com, dev-team@company.com')}
+        //     // }
+        // }
 
-        stage('OCI Image Build') {
-            // If code is SNAPSHOT, don't build image
-            when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
+        // stage('OCI Image Build') {
+        //     // If code is SNAPSHOT, don't build image
+        //     when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
 
-            steps {
-                echo 'Building...'
-                imageBuild()
-            }
-        }
+        //     steps {
+        //         echo 'Building...'
+        //         imageBuild()
+        //     }
+        // }
 
-        stage('Image Push') {
-            // If code is SNAPSHOT, don't try to push any image
-            when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
+        // stage('Image Push') {
+        //     // If code is SNAPSHOT, don't try to push any image
+        //     when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
 
-            steps {
-                echo 'Pushing image...'
-                awsImagePush()
-            }
-        }
+        //     steps {
+        //         echo 'Pushing image...'
+        //         awsImagePush()
+        //     }
+        // }
     }
 }
