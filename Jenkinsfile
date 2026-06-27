@@ -22,11 +22,11 @@ pipeline {
     }
 
     stages {
-        // stage('__init__') {
-        //     steps {
-        //         __init__()
-        //     }
-        // }
+        stage('__init__') {
+            steps {
+                // __init__()
+            }
+        }
 
         // stage('AWS ECR repo check') {
         //     steps {
