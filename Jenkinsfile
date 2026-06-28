@@ -8,8 +8,8 @@ pipeline {
     environment {
         APP_NAME = 'mavenJava'
         // APP_VER = "" // will be assigned dynamic in __init__() based on pom file.
-        //// If destionation REGISTRY and REPO is ECR, variables will be 
-        //// set in Shared Library (awsEcrRepoCheck). For Docker hub, 
+        //// If destionation REGISTRY and REPO is ECR, variables will be
+        //// set in Shared Library (awsEcrRepoCheck). For Docker hub,
         //// follow up three variables should be set manual
         // DEST_CONTAINER_REGISTRY = 'docker.io'
         // DEST_CONTAINER_REPO = "$DEST_CONTAINER_REGISTRY/$APP_NAME"
@@ -17,8 +17,9 @@ pipeline {
         SRC_CONTAINER_REGISTRY = 'docker.io'
         MAVEN_IMG = "$SRC_CONTAINER_REGISTRY/maven:3-eclipse-temurin-17"
         BUILD_IMG = "$SRC_CONTAINER_REGISTRY/eclipse-temurin:17-jre-jammy"
-        AWS_REGION="us-east-1"
-        AWS_CLI_CRED_ID = "aws_devops-user-1_access_k_id_and_key"
+        AWS_REGION = "us-east-1"
+        AWS_CLI_CRED_ID = "aws_devops-user-1_access_k_id_and_key" // Username/Password type of credentials
+        GITHUB_CRED_ID = "github_PAT" // String type of credential
     }
 
     stages {
@@ -69,6 +70,9 @@ pipeline {
             steps {
                 echo 'Pushing image...'
                 awsImagePush() 
+                incrementVersion()
+                gitPushVersionUpdate()
+
             }
         }
     }
