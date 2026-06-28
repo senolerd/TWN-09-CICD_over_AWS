@@ -62,14 +62,14 @@ pipeline {
             }
         }
 
-        // stage('Image Push') {
-        //     // If code is SNAPSHOT, don't try to push any image
-        //     when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
+        stage('Image Push') {
+            // If code is SNAPSHOT, don't try to push any image
+            when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
 
-        //     steps {
-        //         echo 'Pushing image...'
-        //         awsImagePush()
-        //     }
-        // }
+            steps {
+                echo 'Pushing image...'
+                awsImagePush() 
+            }
+        }
     }
 }
