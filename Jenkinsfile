@@ -26,16 +26,16 @@ pipeline {
             steps {
                 echo "init started"
                 __init__()
-                
+
             }
         }
 
-        // stage('AWS ECR repo check') {
-        //     steps {
-        //         echo "AWS ECR repo check for ${APP_NAME.toLowerCase()}"
-        //         awsEcrRepoCheck(APP_NAME.toLowerCase()) // Only for ECR
-        //     }
-        // }
+        stage('AWS ECR repo check') {
+            steps {
+                echo "AWS ECR repo check for ${APP_NAME.toLowerCase()}"
+                awsEcrRepoCheck(APP_NAME.toLowerCase()) // Only for ECR
+            }
+        }
 
         // stage('Maven Packing') {
         //     steps {
