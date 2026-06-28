@@ -38,27 +38,29 @@ pipeline {
         }
 
         stage('Maven Packing') {
+            // We want to check packing for every commit whether SNAPSHOT or not
+            // to be sure codebase ready to be containerized. 
             steps {
                 mavenCleanPackage()
             }
 
-            // post { failure { emailext(
-            //             subject: "⚠️ FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
-            //             body: """Stage 'Maven Compile' failed.
-            //                     Check the logs here: ${env.BUILD_URL}console""",
-            //             to: 'devops-team@company.com, dev-team@company.com')}
-            // }
+            post { failure { emailext(
+                        subject: "⚠️ FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
+                        body: """Stage 'Maven Compile' failed.
+                                Check the logs here: ${env.BUILD_URL}console""",
+                        to: 'senolerd@gmail.com')} // someone who maintains this repo
+            }
         }
 
-        // stage('OCI Image Build') {
-        //     // If code is SNAPSHOT, don't build image
-        //     when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
+        stage('OCI Image Build') {
+            // If code is SNAPSHOT, don't build container image.
+            when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
 
-        //     steps {
-        //         echo 'Building...'
-        //         imageBuild()
-        //     }
-        // }
+            steps {
+                echo 'Building...'
+                imageBuild()
+            }
+        }
 
         // stage('Image Push') {
         //     // If code is SNAPSHOT, don't try to push any image
