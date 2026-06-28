@@ -16,7 +16,8 @@ pipeline {
         // DOCKER_CREDENTIAL_ID =
         SRC_CONTAINER_REGISTRY = 'docker.io'
         MAVEN_IMG = "$SRC_CONTAINER_REGISTRY/maven:3-eclipse-temurin-17"
-        BUILD_IMG = "$SRC_CONTAINER_REGISTRY/eclipse-temurin:17-jre-jammy"
+        BUILD_IMG = "cgr.dev/chainguard/jre:latest"
+        // BUILD_IMG = "$SRC_CONTAINER_REGISTRY/eclipse-temurin:17-jre-jammy"
         AWS_REGION = "us-east-1"
         AWS_CLI_CRED_ID = "aws_devops-user-1_access_k_id_and_key" // Username/Password type of credentials
         GITHUB_CRED_ID = "github_PAT" // String type of credential
@@ -69,10 +70,9 @@ pipeline {
 
             steps {
                 echo 'Pushing image...'
-                awsImagePush() 
+                awsImagePush()
                 incrementVersion()
                 gitPushVersionUpdate()
-
             }
         }
     }
