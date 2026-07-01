@@ -30,57 +30,63 @@ pipeline {
                 script{
                     env.APP_VER = mavenGetAppVersion()
                 }
-                
-                sshagent(['ec2_ssh_key']) {
-                    sh 'ssh -o StrictHostKeyChecking=no ubuntu@18.233.93.104 whoami'
-                }
+
+
             }
         }
 
-        // stage('Maven Packing') {
-        //     // We want to check packing for every commit whether SNAPSHOT or not
-        //     // to be sure codebase ready to be containerized. 
-        //     steps {
-        //         mavenCleanPackage()
-        //     }
+        stage('Maven Packing') {
+            // We want to check packing for every commit whether SNAPSHOT or not
+            // to be sure codebase ready to be containerized. 
+            steps {
+                mavenCleanPackage()
+            }
 
-        //     post { failure { emailext(
-        //                 subject: "⚠️ FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
-        //                 body: """Stage 'Maven Compile' failed.
-        //                         Check the logs here: ${env.BUILD_URL}console""",
-        //                 to: 'senolerd@gmail.com')} // someone who maintains this repo
-        //     }
-        // }
+            post { failure { emailext(
+                        subject: "⚠️ FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
+                        body: """Stage 'Maven Compile' failed.
+                                Check the logs here: ${env.BUILD_URL}console""",
+                        to: 'senolerd@gmail.com')} // someone who maintains this repo
+            }
+        }
 
-        // stage('OCI Image Build') {
-        //     // If code is SNAPSHOT, don't build container image.
-        //     when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
+        stage('OCI Image Build') {
+            // If code is SNAPSHOT, don't build container image.
+            when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
 
-        //     steps {
-        //         echo 'Building...'
-        //         mavenImageBuild()
-        //     }
-        // }
+            steps {
+                echo 'Building...'
+                mavenImageBuild()
+            }
+        }
 
-        // stage('Image CVE Check') {
-        //     // If code is SNAPSHOT, don't build container image.
-        //     when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
+        stage('Image CVE Check') {
+            // If code is SNAPSHOT, don't build container image.
+            when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
 
-        //     steps {
-        //         echo 'ToDo: Add CVE check for new image'
-        //     }
-        // }
+            steps {
+                echo 'ToDo: Add CVE check for new image'
+            }
+        }
 
-        // stage('Image Push') {
-        //     // If code is SNAPSHOT, don't try to push any image
-        //     when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
+        stage('Image Push') {
+            // If code is SNAPSHOT, don't try to push any image
+            when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
 
-        //     steps {
-        //         echo 'Pushing image...'
-        //         awsImagePush()
-        //         mavenIncrementVersion()
-        //         gitPushVersionUpdate()
-        //     }
-        // }
+            steps {
+                echo 'Pushing image...'
+                awsImagePush()
+                mavenIncrementVersion()
+                gitPushVersionUpdate()
+
+
+                sshagent(['ec2_ssh_key']) {
+                    sh 'ssh -o StrictHostKeyChecking=no ubuntu@18.233.93.104 whoami'
+                }
+
+
+
+            }
+        }
     }
 }
