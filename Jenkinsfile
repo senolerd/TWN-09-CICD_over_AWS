@@ -29,7 +29,7 @@ pipeline {
             steps {
                 env.APP_VER = mavenGetAppVersion()
                 sshagent(['ec2_ssh_key']) {
-                    ssh -o StrictHostKeyChecking=no ubuntu@18.233.93.104 whoami
+                    sh 'ssh -o StrictHostKeyChecking=no ubuntu@18.233.93.104 whoami'
                 }
             }
         }
