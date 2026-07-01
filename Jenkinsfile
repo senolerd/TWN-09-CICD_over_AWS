@@ -6,7 +6,7 @@
 pipeline {
     agent any
     environment {
-        APP_NAME = 'mavenJava'
+        APP_NAME = 'mavenJava-Dev'
         MAVEN_IMG = "docker.io/maven:3-eclipse-temurin-17"
         BUILD_IMG = "cgr.dev/chainguard/jre:latest" // Chainguard' hardened JRE image.
         // BUILD_IMG = "$SRC_CONTAINER_REGISTRY/eclipse-temurin:17-jre-jammy"
