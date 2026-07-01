@@ -27,7 +27,10 @@ pipeline {
     stages {
         stage('__init__') {
             steps {
-                env.APP_VER = mavenGetAppVersion()
+                script{
+                    env.APP_VER = mavenGetAppVersion()
+                }
+                
                 sshagent(['ec2_ssh_key']) {
                     sh 'ssh -o StrictHostKeyChecking=no ubuntu@18.233.93.104 whoami'
                 }
