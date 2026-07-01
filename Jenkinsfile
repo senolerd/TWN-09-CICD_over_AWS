@@ -7,73 +7,77 @@ pipeline {
     agent any
     environment {
         APP_NAME = 'mavenJava'
-        // APP_VER = "" // will be assigned dynamic in __init__() based on pom file.
-        //// If destionation REGISTRY and REPO is ECR, variables will be
-        //// set in Shared Library (awsEcrRepoCheck). For Docker hub,
-        //// follow up three variables should be set manual
-        // DEST_CONTAINER_REGISTRY = 'docker.io'
-        // DEST_CONTAINER_REPO = "$DEST_CONTAINER_REGISTRY/$APP_NAME"
-        // DOCKER_CREDENTIAL_ID =
-        SRC_CONTAINER_REGISTRY = 'docker.io'
-        MAVEN_IMG = "$SRC_CONTAINER_REGISTRY/maven:3-eclipse-temurin-17"
-        BUILD_IMG = "cgr.dev/chainguard/jre:latest"
+        MAVEN_IMG = "docker.io/maven:3-eclipse-temurin-17"
+        BUILD_IMG = "cgr.dev/chainguard/jre:latest" // Chainguard' hardened JRE image.
         // BUILD_IMG = "$SRC_CONTAINER_REGISTRY/eclipse-temurin:17-jre-jammy"
+        GITHUB_CRED_ID = "github_PAT" // String type of credential. Will be used for git push after version increment.
+
+        // An AWS user with ECR permissons of "getting auth token" and "pushing images" to ECR. Also ec2:DescribeInstances 
+        // to get EC2 instance Public IP address by its Name tag. This user should not have any other permissions.
+        // To make this pipeline works, this AWS users API key ID and secret key should be added to Jenkins credentials
+        // as "Username/Password" type of credential. awsImagePush() will use AWS STS to get Account ID, then create ECR 
+        // registry URL, then push the image to ECR. Account ID is not hardcoded in this pipeline, so it can be used for any AWS account.
+        // Don't forget to update this Jenkins credential's ID at AWS_CLI_CRED_ID env variable.
+        AWS_CLI_CRED_ID = "aws_devops-user-1_access_k_id_and_key" // Username/Password type of aws credentials
         AWS_REGION = "us-east-1"
-        AWS_CLI_CRED_ID = "aws_devops-user-1_access_k_id_and_key" // Username/Password type of credentials
-        GITHUB_CRED_ID = "github_PAT" // String type of credential
+        AWS_EC2_TAG = "PODMAN_SERVER" // Name tag of podman application server should have.
+        EC2_SSH_CRED_ID = "ec2_ssh_key" // SSH key credential for Jenkins to connect to EC2 instance where podman is running
     }
 
     stages {
         stage('__init__') {
             steps {
-                echo "init started"
-                __init__()
-
+                env.APP_VER = mavenGetAppVersion()
+                sshagent(['ec2_ssh_key']) {
+                    ssh -o StrictHostKeyChecking=no ubuntu@18.233.93.104 whoami
+                }
             }
         }
 
-        stage('AWS ECR repo check') {
-            steps {
-                echo "AWS ECR repo check for ${APP_NAME.toLowerCase()}"
-                awsEcrRepoCheck(APP_NAME.toLowerCase()) // Only for ECR
-            }
-        }
+        // stage('Maven Packing') {
+        //     // We want to check packing for every commit whether SNAPSHOT or not
+        //     // to be sure codebase ready to be containerized. 
+        //     steps {
+        //         mavenCleanPackage()
+        //     }
 
-        stage('Maven Packing') {
-            // We want to check packing for every commit whether SNAPSHOT or not
-            // to be sure codebase ready to be containerized. 
-            steps {
-                mavenCleanPackage()
-            }
+        //     post { failure { emailext(
+        //                 subject: "⚠️ FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
+        //                 body: """Stage 'Maven Compile' failed.
+        //                         Check the logs here: ${env.BUILD_URL}console""",
+        //                 to: 'senolerd@gmail.com')} // someone who maintains this repo
+        //     }
+        // }
 
-            post { failure { emailext(
-                        subject: "⚠️ FAILED: Job '${env.JOB_NAME}' [Build #${env.BUILD_NUMBER}]",
-                        body: """Stage 'Maven Compile' failed.
-                                Check the logs here: ${env.BUILD_URL}console""",
-                        to: 'senolerd@gmail.com')} // someone who maintains this repo
-            }
-        }
+        // stage('OCI Image Build') {
+        //     // If code is SNAPSHOT, don't build container image.
+        //     when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
 
-        stage('OCI Image Build') {
-            // If code is SNAPSHOT, don't build container image.
-            when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
+        //     steps {
+        //         echo 'Building...'
+        //         mavenImageBuild()
+        //     }
+        // }
 
-            steps {
-                echo 'Building...'
-                imageBuild()
-            }
-        }
+        // stage('Image CVE Check') {
+        //     // If code is SNAPSHOT, don't build container image.
+        //     when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
 
-        stage('Image Push') {
-            // If code is SNAPSHOT, don't try to push any image
-            when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
+        //     steps {
+        //         echo 'ToDo: Add CVE check for new image'
+        //     }
+        // }
 
-            steps {
-                echo 'Pushing image...'
-                awsImagePush()
-                incrementVersion()
-                gitPushVersionUpdate()
-            }
-        }
+        // stage('Image Push') {
+        //     // If code is SNAPSHOT, don't try to push any image
+        //     when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
+
+        //     steps {
+        //         echo 'Pushing image...'
+        //         awsImagePush()
+        //         mavenIncrementVersion()
+        //         gitPushVersionUpdate()
+        //     }
+        // }
     }
 }
