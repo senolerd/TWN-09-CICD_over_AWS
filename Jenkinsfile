@@ -90,8 +90,9 @@ pipeline {
                         env.EC2_SERVER_IP = sh(script: '''
                             podman run --rm -e AWS_ACCESS_KEY_ID=$AWS_KID -e AWS_SECRET_ACCESS_KEY=$AWS_KEY \
                             -e AWS_DEFAULT_REGION=$AWS_REGION docker.io/amazon/aws-cli ec2 describe-instances \
-                            --query "Reservations[].Instances[?Tags[?Key=='Name' && Value=='${PODMAN_SERVER}']].PublicIpAddress" --output text
+                            --query "Reservations[].Instances[?Tags[?Key=='Name' && Value=='${AWS_EC2_TAG}']].PublicIpAddress" --output text
                             ''', returnStdout: true).trim()
+
                         echo "EC2 Server IP: ${env.EC2_SERVER_IP}"
                     }
                 }
@@ -99,19 +100,12 @@ pipeline {
                 sshagent(['ec2_ssh_key']) {
                     withCredentials([sshUserPrivateKey(credentialsId: env.EC2_SSH_CRED_ID, keyFileVariable: 'SSH_FILE', usernameVariable: 'EC2_SSH_USR'    )]) {
                         script{
-                            sh "ssh -o StrictHostKeyChecking=no ${EC2_SSH_USR}@$EC2_SERVER_IP whoami"
+                            sh "ssh -o StrictHostKeyChecking=no ${EC2_SSH_USR}@${EC2_SERVER_IP} whoami"
                         }
                     }
                 }
 
-
-// withCredentials([sshUserPrivateKey(credentialsId: '', keyFileVariable: 'SSH_FILE', usernameVariable: 'ubuntu')]) {
-//     // some block
-// }
-
-
-
-                gitPushVersionUpdate()
+                // gitPushVersionUpdate()
             }
         }
     
