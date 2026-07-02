@@ -74,7 +74,7 @@ pipeline {
                 echo 'Pushing image...'
                 awsImagePush()
                 mavenIncrementVersion()
-                gitPushVersionUpdate()
+
             }
         }
 
@@ -97,13 +97,25 @@ pipeline {
                 }
 
                 sshagent(['ec2_ssh_key']) {
-                    withCredentials([usernamePassword(credentialsId: env.EC2_SSH_CRED_ID, passwordVariable: 'EC2_SSH_KEY', usernameVariable: 'EC2_SSH_USER')]) {
+                    withCredentials([sshUserPrivateKey(credentialsId: env.EC2_SSH_CRED_ID, keyFileVariable: 'SSH_FILE', usernameVariable: 'EC2_SSH_USR'    )]) {
                         script{
-                            sh 'ssh -o StrictHostKeyChecking=no ${EC2_SSH_USER}@${env.EC2_SERVER_IP} whoami'
+                            sh 'ssh -o StrictHostKeyChecking=no ${EC2_SSH_USR}@${env.EC2_SERVER_IP} whoami'
                         }
                     }
                 }
+
+
+// withCredentials([sshUserPrivateKey(credentialsId: '', keyFileVariable: 'SSH_FILE', usernameVariable: 'ubuntu')]) {
+//     // some block
+// }
+
+
+
+                gitPushVersionUpdate()
             }
         }
+    
+    
+    
     }
 }
