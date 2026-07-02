@@ -99,7 +99,7 @@ pipeline {
                 sshagent(['ec2_ssh_key']) {
                     withCredentials([sshUserPrivateKey(credentialsId: env.EC2_SSH_CRED_ID, keyFileVariable: 'SSH_FILE', usernameVariable: 'EC2_SSH_USR'    )]) {
                         script{
-                            sh 'ssh -o StrictHostKeyChecking=no ${EC2_SSH_USR}@$EC2_SERVER_IP whoami'
+                            sh "ssh -o StrictHostKeyChecking=no ${EC2_SSH_USR}@$EC2_SERVER_IP whoami"
                         }
                     }
                 }
