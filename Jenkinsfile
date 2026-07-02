@@ -89,9 +89,10 @@ pipeline {
                     script{
                         env.EC2_SERVER_IP = sh(script: '''
                             podman run --rm -e AWS_ACCESS_KEY_ID=$AWS_KID -e AWS_SECRET_ACCESS_KEY=$AWS_KEY \
-                            -e AWS_DEFAULT_REGION=$AWS_REGION docker.io/amazon/aws-cli c2 describe-instances \
+                            -e AWS_DEFAULT_REGION=$AWS_REGION docker.io/amazon/aws-cli ec2 describe-instances \
                             --query "Reservations[].Instances[?Tags[?Key=='Name' && Value=='${PODMAN_SERVER}']].PublicIpAddress" --output text
                             ''', returnStdout: true).trim()
+                        echo "EC2 Server IP: ${env.EC2_SERVER_IP}"
                     }
                 }
 
