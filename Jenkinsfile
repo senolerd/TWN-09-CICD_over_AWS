@@ -78,12 +78,11 @@ pipeline {
             }
         }
 
-        stage('Deploy to Podman Server') {
+        stage('Deploy to EC2 Podman') {
             // If code is SNAPSHOT, don't try to push any image
             when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
 
             steps {
-                echo 'Deploying image to podman server...'
                 withCredentials([usernamePassword(credentialsId: env.AWS_CLI_CRED_ID, passwordVariable: 'AWS_KEY', usernameVariable: 'AWS_KID')]) {
 
                     script{
@@ -98,9 +97,9 @@ pipeline {
                 }
 
                 sshagent(['ec2_ssh_key']) {
-                    withCredentials([sshUserPrivateKey(credentialsId: env.EC2_SSH_CRED_ID, keyFileVariable: 'SSH_FILE', usernameVariable: 'EC2_SSH_USR'    )]) {
+                    withCredentials([sshUserPrivateKey(credentialsId: env.EC2_SSH_CRED_ID, keyFileVariable: 'SSH_FILE', usernameVariable: 'EC2_SSH_USR')]) {
                         script{
-                            sh "ssh -o StrictHostKeyChecking=no ${EC2_SSH_USR}@${EC2_SERVER_IP} whoami"
+                            sh "ssh -o StrictHostKeyChecking=no ${EC2_SSH_USR}@${EC2_SERVER_IP} podman version"
                         }
                     }
                 }
