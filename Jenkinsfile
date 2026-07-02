@@ -79,14 +79,57 @@ pipeline {
                 mavenIncrementVersion()
                 gitPushVersionUpdate()
 
+                withCredentials([usernamePassword(credentialsId: env.AWS_CLI_CRED_ID, passwordVariable: 'AWS_KEY', usernameVariable: 'AWS_KID')]) {
 
-                sshagent(['ec2_ssh_key']) {
-                    sh 'ssh -o StrictHostKeyChecking=no ubuntu@18.233.93.104 whoami'
+                    env.EC2_SERVER_IP = sh(script: '''
+                        podman run --rm -e AWS_ACCESS_KEY_ID=$AWS_KID -e AWS_SECRET_ACCESS_KEY=$AWS_KEY \
+                        -e AWS_DEFAULT_REGION=$AWS_REGION docker.io/amazon/aws-cli c2 describe-instances \
+                        --query "Reservations[].Instances[?Tags[?Key=='Name' && Value=='${PODMAN_SERVER}']].PublicIpAddress" --output text
+                        ''', returnStdout: true).trim()
                 }
 
-
-
+                sshagent(['ec2_ssh_key']) {
+                    withCredentials([usernamePassword(credentialsId: env.EC2_SSH_CRED_ID, passwordVariable: 'EC2_SSH_KEY', usernameVariable: 'EC2_SSH_USER')]) {
+                        sh 'ssh -o StrictHostKeyChecking=no ${EC2_SSH_USER}@${env.EC2_SERVER_IP} whoami'
+                    }
+                }
             }
         }
+
+        stage('Deploy to Podman Server') {
+            // If code is SNAPSHOT, don't try to push any image
+            when { expression { !APP_VER.endsWith('-SNAPSHOT') } }
+
+            steps {
+                echo 'Deploying image to podman server...'
+                withCredentials([usernamePassword(credentialsId: env.AWS_CLI_CRED_ID, passwordVariable: 'AWS_KEY', usernameVariable: 'AWS_KID')]) {
+
+                    env.EC2_SERVER_IP = sh(script: '''
+                        podman run --rm -e AWS_ACCESS_KEY_ID=$AWS_KID -e AWS_SECRET_ACCESS_KEY=$AWS_KEY \
+                        -e AWS_DEFAULT_REGION=$AWS_REGION docker.io/amazon/aws-cli c2 describe-instances \
+                        --query "Reservations[].Instances[?Tags[?Key=='Name' && Value=='${PODMAN_SERVER}']].PublicIpAddress" --output text
+                        ''', returnStdout: true).trim()
+                }
+
+                sshagent(['ec2_ssh_key']) {
+                    withCredentials([usernamePassword(credentialsId: env.EC2_SSH_CRED_ID, passwordVariable: 'EC2_SSH_KEY', usernameVariable: 'EC2_SSH_USER')]) {
+                        sh 'ssh -o StrictHostKeyChecking=no ${EC2_SSH_USER}@${env.EC2_SERVER_IP} whoami'
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }
